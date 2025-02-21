@@ -1,10 +1,10 @@
 import requests
 from bs4 import BeautifulSoup
-
+import re
 import requests
 
 # URL de la API o sitio donde quieres hacer la solicitud POST
-urlLogin = "https://webhook.site/afe7ffd4-5eac-47fe-a042-e463320e54e2"
+urlLogin = "http://localhost:3000/products"
 
 
 # Encabezados (si la API lo requiere)
@@ -20,7 +20,7 @@ headersLogin = {
 
 
 # URL de la tienda
-url = "https://scrapeme.live/shop/"
+url = "http://scrapeme.live/shop/"
 
 # Encabezados para evitar bloqueos
 headers = {
@@ -42,10 +42,15 @@ if response.status_code == 200:
         price = product.find("span", class_="woocommerce-Price-amount").text.strip()
         link = product.find("a", class_="woocommerce-LoopProduct-link")["href"]
         image = product.find("img")["src"]
+        match = re.match(r"([^\d]+)([\d,.]+)", price)
+        if match:
+            currency = match.group(1)  # Captura el símbolo de moneda
+            amount = match.group(2)  # Captura el valor numérico
 
         data = {
             "name": name,
-            "price": price,
+            "price": amount,
+            "stock": 1,
             "link": link,
             "image": image
         }
